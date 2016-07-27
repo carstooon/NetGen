@@ -17,7 +17,7 @@ GeneticAlgorithm::GeneticAlgorithm(const unsigned int SizeOfPopulation, unsigned
 }
 
 void GeneticAlgorithm::PrintPopulation(){
-  double meanOfFitness = -1;
+  double meanOfFitness = 0;
   for (auto& i: population){
     // std::cout << i.first << " " << i.second << "\n";
     meanOfFitness += i.second;
@@ -36,9 +36,6 @@ void GeneticAlgorithm::PrintPopulation(){
     " F: " << i.second << std::endl;
 
   }
-
-
-
 
   std::cout << "Mean of Fitness in Population: " << meanOfFitness/fSizeOfPopulation << std::endl;
 }
