@@ -4,7 +4,8 @@
 #include <vector>
 #include <random>
 #include <utility>
-
+#include "TH1F.h"
+#include "TCanvas.h"
 // unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 
 
@@ -26,13 +27,20 @@ private:
   double      EvaluateFitness(std::string newChild);
   int         GetWeakling(std::vector<std::pair<std::string, double> >);
   std::string BinToDec(const std::string& sseq);
-public:
+  double      PrintPopulation();
   void        MakeNewChild();
+
+  int         fMaxNumberOfGenerations;
+  TCanvas     fCanvas;
+  TH1F        fFitnessPerGeneration;
+  int         fCurrentGeneration = 0;
+public:
   void        MakeNewGeneration();
+  void        SaveFitnessHistogram(std::string filename = "fitness.pdf");
+  // void        SetNumberOfGenerations(const int i){fMaxNumberOfGenerations = i;}
 
 
-  void PrintPopulation();
-  GeneticAlgorithm (unsigned int SizeOfPopulation, unsigned int ChromosomLength, unsigned int NumberOfGenes);
+  GeneticAlgorithm (unsigned int SizeOfPopulation, unsigned int ChromosomLength, unsigned int NumberOfGenes, int maxNumberofGenerations = 100);
   virtual ~GeneticAlgorithm ();
 
 };

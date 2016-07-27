@@ -7,6 +7,7 @@
 #include "MNISTReader.h"
 #include "NeuralNetwork.h"
 #include "GeneticAlgorithm.h"
+#include "TError.h"
 
 void MNIST_NN();
 void GeneticTest();
@@ -14,18 +15,22 @@ void GeneticTest();
 
 
 int main(){
+  gErrorIgnoreLevel = kWarning;
+
   // MNIST_NN();
   GeneticTest();
   return 0;
 }
 
 void GeneticTest(){
-  GeneticAlgorithm gen(5, 6, 3);
-  gen.PrintPopulation();
-  gen.MakeNewGeneration();
-  gen.PrintPopulation();
-  // gen.MakeNewChild();
-  // std::cout << gen.CreateRandomChromosom(6, 4) << std::endl;
+  int numberOfGenerations = 10;
+  GeneticAlgorithm gen(20, 6, 3, numberOfGenerations);
+  // gen.PrintPopulation();
+  for (int i = 0; i < numberOfGenerations; ++i){
+    gen.MakeNewGeneration();
+    // gen.PrintPopulation();
+  }
+  gen.SaveFitnessHistogram();
 }
 
 
