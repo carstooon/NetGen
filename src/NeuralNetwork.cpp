@@ -193,7 +193,7 @@ double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int Training
   if (TrainingsSize == -1) TrainingsSize = fTrainingsSize;
 
   for (int k = 0; k < epochs; ++k){
-    if (k % 5 == 0) std::cout << "Epoch nr. " << k << " started!" << std::endl;
+    // if (k % 5 == 0) std::cout << "Epoch nr. " << k << " started!" << std::endl;
     for (int i = 0; i < TrainingsSize / MiniBatchSize; ++i){
       for (int j = 0; j < MiniBatchSize; ++j){
         SetInputVectorInMiniBatch(fTrainingsdata[i*10 + j], fTrainingslabel[i*10 + j]);

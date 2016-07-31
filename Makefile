@@ -5,7 +5,7 @@ CXXFLAGS = -O3 -march=native -std=c++14 -I`root-config --incdir`
 LDFLAGS = -larmadillo `root-config --libs` -lEG
 # LDFLAGS =
 
-OBJ = obj/start.o obj/MNISTReader.o obj/NeuralNetwork.o obj/GeneticAlgorithm.o
+OBJ = obj/start.o obj/MNISTReader.o obj/NeuralNetwork.o obj/GeneticAlgorithm.o obj/FitnessMNIST.o
 
 run: $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)

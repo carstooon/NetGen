@@ -8,6 +8,7 @@
 #include "TCanvas.h"
 // unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 
+class FitnessClass;
 
 class GeneticAlgorithm {
 private:
@@ -34,13 +35,18 @@ private:
   TCanvas     fCanvas;
   TH1F        fFitnessPerGeneration;
   int         fCurrentGeneration = 0;
+  FitnessClass* fFitnessClass;
 public:
   void        MakeNewGeneration();
   void        SaveFitnessHistogram(std::string filename = "fitness.pdf");
   // void        SetNumberOfGenerations(const int i){fMaxNumberOfGenerations = i;}
 
 
-  GeneticAlgorithm (unsigned int SizeOfPopulation, unsigned int ChromosomLength, unsigned int NumberOfGenes, int maxNumberofGenerations = 100);
+  GeneticAlgorithm (unsigned int SizeOfPopulation,
+                    unsigned int ChromosomLength,
+                    unsigned int NumberOfGenes,
+                    int maxNumberofGenerations,
+                    FitnessClass* fitness);
   virtual ~GeneticAlgorithm ();
 
 };

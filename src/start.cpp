@@ -6,6 +6,8 @@
 
 #include "MNISTReader.h"
 #include "NeuralNetwork.h"
+
+#include "FitnessMNIST.h"
 #include "GeneticAlgorithm.h"
 #include "TError.h"
 
@@ -23,8 +25,9 @@ int main(){
 }
 
 void GeneticTest(){
-  int numberOfGenerations = 10;
-  GeneticAlgorithm gen(20, 6, 3, numberOfGenerations);
+  FitnessMNIST* fitness = new FitnessMNIST();
+  int numberOfGenerations = 2;
+  GeneticAlgorithm gen(5, 6, 3, numberOfGenerations, fitness);
   // gen.PrintPopulation();
   for (int i = 0; i < numberOfGenerations; ++i){
     gen.MakeNewGeneration();
