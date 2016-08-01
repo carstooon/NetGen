@@ -5,7 +5,8 @@
 #include <utility>
 #include <armadillo>
 #include <string>
-
+#include "TCanvas.h"
+#include "TH1F.h"
 class NeuralNetwork {
 private:
   std::vector<int> neurons;
@@ -23,6 +24,7 @@ private:
   std::vector<int> fTrainingslabel;
   std::vector<std::vector<double> > fTestingdata;
   std::vector<int> fTestinglabel;
+
 
 
   arma::vec FeedForward(std::vector<double> input);
@@ -45,7 +47,7 @@ public:
   void SetTrainingslabel(std::vector<int> Trainingslabel) {fTrainingslabel = Trainingslabel;}
   void SetTestingdata   (std::vector<std::vector<double> > Testingdata);
   void SetTestinglabel  (std::vector<int> Testinglabel) {fTestinglabel = Testinglabel;}
-  double LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize = -1, bool TestOnTrainingsData = false, bool TestOnTestingData = false);
+  double LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize = -1, bool TestOnTrainingsData = false, bool TestOnTestingData = false, std::string SavePath = "accuracy.pdf");
   bool Evaluate(std::vector<double> input, int label);
 
   // File Handling

@@ -30,8 +30,7 @@ void FitnessMNIST::PrintGen(std::pair<std::string, double> i){
 }
 
 
-
-double FitnessMNIST::CalculateFitness(std::string genome){
+double FitnessMNIST::CalculateFitness(std::string genome, int currentGeneration, int genNumber){
   double fitness = -1;
 
 
@@ -65,12 +64,16 @@ double FitnessMNIST::CalculateFitness(std::string genome){
 
 
   int mini_batch_size = 10;
-  int epochs = 1;
+  int epochs = 10;
   int size_of_trainings_sample = 600;
   bool Evaluate_performance_on_trainingsdata = true;
   bool Evaluate_performance_on_testdata = true;
 
-  fitness = net.LearnGivenData(mini_batch_size, epochs, size_of_trainings_sample, Evaluate_performance_on_trainingsdata, Evaluate_performance_on_testdata);
+  std::string SavePath = Form("fitness/generation_%d/", currentGeneration);
+  system(Form("mkdir -p %s", SavePath.c_str()));
+  SavePath = Form("%snew_produced_gen_%d.pdf", SavePath.c_str(), genNumber);
+
+  fitness = net.LearnGivenData(mini_batch_size, epochs, size_of_trainings_sample, Evaluate_performance_on_trainingsdata, Evaluate_performance_on_testdata, SavePath);
 
 
   return fitness;

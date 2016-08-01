@@ -111,11 +111,17 @@ void NeuralNetwork::LearnMiniBatches(){
   std::vector<arma::vec > delta_nabla_b;
   std::vector<arma::mat > delta_nabla_w;
 
+  vecNablaBiases.resize(matWeights.size());
+  matNablaWeights.resize(matWeights.size());
+  delta_nabla_b.resize(matWeights.size());
+  delta_nabla_w.resize(matWeights.size());
+
+
   for (unsigned int i = 0; i < matWeights.size(); ++i){
-    vecNablaBiases.push_back(arma::vec(vecBiases.at(i).n_rows, arma::fill::zeros));
-    delta_nabla_b.push_back(arma::vec(vecBiases.at(i).n_rows, arma::fill::zeros));
-    matNablaWeights.push_back(arma::mat(matWeights.at(i).n_rows, matWeights.at(i).n_cols, arma::fill::zeros));
-    delta_nabla_w.push_back(arma::mat(matWeights.at(i).n_rows, matWeights.at(i).n_cols, arma::fill::zeros));
+    vecNablaBiases[i] = arma::vec(vecBiases.at(i).n_rows, arma::fill::zeros);
+    delta_nabla_b[i] = arma::vec(vecBiases.at(i).n_rows, arma::fill::zeros);
+    matNablaWeights[i] = arma::mat(matWeights.at(i).n_rows, matWeights.at(i).n_cols, arma::fill::zeros);
+    delta_nabla_w[i] = arma::mat(matWeights.at(i).n_rows, matWeights.at(i).n_cols, arma::fill::zeros);
   }
   for (unsigned int k = 0; k < vecMiniBatch.size(); ++k){
     // Calculate the delta b and w by minimizing the cost function
@@ -184,12 +190,12 @@ void NeuralNetwork::SetTestingdata   (std::vector<std::vector<double> > Testingd
 
 
 // ################################################
-double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize, bool TestOnTrainingsData, bool TestOnTestingData){
+double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize, bool TestOnTrainingsData, bool TestOnTestingData, std::string SavePath){
+
   TCanvas c1("Accuracy", "Accuracy", 600, 500);
   TH1F axis("axis", "Accuracy of Neural Network;epochs", epochs, 0.5, epochs+0.5);
   TH1F acc_test ("acc_test" , "Classification accuracy", epochs, 0.5, epochs+0.5);
   TH1F acc_train("acc_train", "Classification accuracy", epochs, 0.5, epochs+0.5);
-
   if (TrainingsSize == -1) TrainingsSize = fTrainingsSize;
 
   for (int k = 0; k < epochs; ++k){
@@ -198,7 +204,6 @@ double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int Training
       for (int j = 0; j < MiniBatchSize; ++j){
         SetInputVectorInMiniBatch(fTrainingsdata[i*10 + j], fTrainingslabel[i*10 + j]);
       }
-
       LearnMiniBatches();
     }
     if (TestOnTestingData){
@@ -252,7 +257,7 @@ double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int Training
   leg.AddEntry(&acc_train, Form("Trainings data (Maximum: %3.2f)", max_trainingsdata), "p");
   leg.Draw("same");
 
-  c1.SaveAs("accuracy.pdf");
+  c1.SaveAs(SavePath.c_str());
   // std::cout << "Learning completed" << std::endl;
   return max_testdata;
 }

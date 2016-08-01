@@ -25,13 +25,12 @@ int main(){
 }
 
 void GeneticTest(){
+  system("rm -rf fitness/");
   FitnessMNIST* fitness = new FitnessMNIST();
   int numberOfGenerations = 2;
-  GeneticAlgorithm gen(5, 6, 3, numberOfGenerations, fitness);
-  // gen.PrintPopulation();
+  GeneticAlgorithm gen(3, 6, 3, numberOfGenerations, fitness);
   for (int i = 0; i < numberOfGenerations; ++i){
     gen.MakeNewGeneration();
-    // gen.PrintPopulation();
   }
   gen.SaveFitnessHistogram();
 }
