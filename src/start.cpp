@@ -19,8 +19,8 @@ void GeneticTest();
 int main(){
   gErrorIgnoreLevel = kWarning;
 
-  // MNIST_NN();
-  GeneticTest();
+  MNIST_NN();
+  // GeneticTest();
   return 0;
 }
 
@@ -41,27 +41,27 @@ void MNIST_NN(){
   // // fashion 784 (input) * 20 (hidden) * 10 (output)
   // // To be set by user
   MNISTReader reader;
-  reader.read_mnist("data/train-images.idx3-ubyte", true);
-  reader.read_mnist_labels("data/train-labels.idx1-ubyte", true);
-  reader.read_mnist("data/t10k-images.idx3-ubyte", false);
-  reader.read_mnist_labels("data/t10k-labels.idx1-ubyte", false);
+  reader.read_mnist("data/train-images-idx3-ubyte", true);
+  reader.read_mnist_labels("data/train-labels-idx1-ubyte", true);
+  reader.read_mnist("data/t10k-images-idx3-ubyte", false);
+  reader.read_mnist_labels("data/t10k-labels-idx1-ubyte", false);
 
 
 
-  std::vector<int> neuronsPerLayer = {784, 100, 100, 10};
+  std::vector<int> neuronsPerLayer = {784, 30, 10};
   int MaxSizeOfTrainingsSample = 60000;
   double LearningRate = 1.0;
   double DecayRate = 2.0;
 
 
-  int epochs = 10;
+  int epochs = 20;
   int size_of_trainings_sample = 60000;
   bool Evaluate_performance_on_trainingsdata = true;
   bool Evaluate_performance_on_testdata = true;
 
 
   NeuralNetwork net(neuronsPerLayer,
-                    NeuralNetwork::CostFunction::kCE,
+                    NeuralNetwork::CostFunction::kMSE,
                     MaxSizeOfTrainingsSample,
                     LearningRate,
                     DecayRate);
@@ -73,7 +73,7 @@ void MNIST_NN(){
   net.SetTestingdata(reader.GetTestingDataSet());
   net.SetTestinglabel(reader.GetTestingLabel());
 
-  net.LearnGivenData(10, epochs, size_of_trainings_sample, Evaluate_performance_on_trainingsdata, Evaluate_performance_on_testdata);
+  net.LearnGivenData(10, epochs, size_of_trainings_sample, Evaluate_performance_on_trainingsdata, Evaluate_performance_on_testdata, "");
 
 
 

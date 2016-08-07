@@ -31,7 +31,7 @@ private:
   int SoftMax(arma::vec vec);
   arma::vec ActivationFunction(arma::vec vec);
   arma::vec ActivationFunctionDerivative(arma::vec vec);
-  arma::vec CostFunctionDerivative(arma::vec outputNN, arma::vec truevec, arma::vec zValues, int type);
+  arma::vec CostFunctionDerivative(arma::vec outputNN, arma::vec truevec, arma::vec zValues);
   void SetInputVectorInMiniBatch(std::vector<double> input, int label);
   void Backprop(std::vector<arma::vec>& delta_nabla_b, std::vector<arma::mat>& delta_nabla_w,
                 const arma::vec& input, int output);
@@ -49,6 +49,7 @@ public:
   void SetTestinglabel  (std::vector<int> Testinglabel) {fTestinglabel = Testinglabel;}
   double LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize = -1, bool TestOnTrainingsData = false, bool TestOnTestingData = false, std::string SavePath = "accuracy.pdf");
   bool Evaluate(std::vector<double> input, int label);
+  double EvaluateCost(std::vector<double> input, int label);
 
   // File Handling
   bool WriteWeightsToFile(std::string);

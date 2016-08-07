@@ -51,10 +51,10 @@ double FitnessMNIST::CalculateFitness(std::string genome, int currentGeneration,
                     DecayRate);
 
   MNISTReader reader;
-  reader.read_mnist("data/train-images.idx3-ubyte", true);
-  reader.read_mnist_labels("data/train-labels.idx1-ubyte", true);
-  reader.read_mnist("data/t10k-images.idx3-ubyte", false);
-  reader.read_mnist_labels("data/t10k-labels.idx1-ubyte", false);
+  reader.read_mnist("data/train-images-idx3-ubyte", true);
+  reader.read_mnist_labels("data/train-labels-idx1-ubyte", true);
+  reader.read_mnist("data/t10k-images-idx3-ubyte", false);
+  reader.read_mnist_labels("data/t10k-labels-idx1-ubyte", false);
 
   net.SetTrainingsdata(reader.GetTrainingsDataSet());
   net.SetTrainingslabel(reader.GetTrainingsLabel());
@@ -71,7 +71,7 @@ double FitnessMNIST::CalculateFitness(std::string genome, int currentGeneration,
 
   std::string SavePath = Form("fitness/generation_%d/", currentGeneration);
   system(Form("mkdir -p %s", SavePath.c_str()));
-  SavePath = Form("%snew_produced_gen_%d.pdf", SavePath.c_str(), genNumber);
+  SavePath = Form("%snew_produced_gen_%d", SavePath.c_str(), genNumber);
 
   fitness = net.LearnGivenData(mini_batch_size, epochs, size_of_trainings_sample, Evaluate_performance_on_trainingsdata, Evaluate_performance_on_testdata, SavePath);
 

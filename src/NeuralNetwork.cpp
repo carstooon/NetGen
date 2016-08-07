@@ -96,9 +96,9 @@ arma::vec NeuralNetwork::ActivationFunctionDerivative(arma::vec vec){
 
 
 // ################################################
-arma::vec NeuralNetwork::CostFunctionDerivative(arma::vec outputNN, arma::vec truevec, arma::vec zValues, int type){
-  if (type == kCE) return (outputNN - truevec);
-  if (type == kMSE) return (outputNN - truevec) % ActivationFunctionDerivative(zValues);
+arma::vec NeuralNetwork::CostFunctionDerivative(arma::vec outputNN, arma::vec truevec, arma::vec zValues){
+  if (fCostFunction == kCE) return (outputNN - truevec);
+  if (fCostFunction == kMSE) return (outputNN - truevec) % ActivationFunctionDerivative(zValues);
   else { std::cout <<  "NO COST FUNCTION SET; Using CE" << std::endl; return (outputNN - truevec);}
 }
 
@@ -162,7 +162,7 @@ void NeuralNetwork::Backprop(std::vector<arma::vec>& delta_nabla_b, // is to be 
   trueoutput.zeros(neurons[neurons.size()-1]);
   trueoutput[output] = 1;
 
-  arma::vec delta = CostFunctionDerivative(activations[activations.size()-1], trueoutput, zValues[zValues.size()-1], fCostFunction);
+  arma::vec delta = CostFunctionDerivative(activations[activations.size()-1], trueoutput, zValues[zValues.size()-1]);
 
   delta_nabla_b[delta_nabla_b.size()-1] = delta;
   delta_nabla_w[delta_nabla_w.size()-1] = delta * activations[activations.size() - 2].t();
@@ -193,9 +193,17 @@ void NeuralNetwork::SetTestingdata   (std::vector<std::vector<double> > Testingd
 double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int TrainingsSize, bool TestOnTrainingsData, bool TestOnTestingData, std::string SavePath){
 
   TCanvas c1("Accuracy", "Accuracy", 600, 500);
+  TCanvas c2("Cost", "Cost", 600, 500);
+  TCanvas c3("summary", "summary", 1200, 500);
+  c3.SetGrid();
+  c3.Divide(2);
+  c1.cd();
   TH1F axis("axis", "Accuracy of Neural Network;epochs", epochs, 0.5, epochs+0.5);
   TH1F acc_test ("acc_test" , "Classification accuracy", epochs, 0.5, epochs+0.5);
   TH1F acc_train("acc_train", "Classification accuracy", epochs, 0.5, epochs+0.5);
+  TH1F axis2("axis2", "Cost Function of Neural Network;epochs", epochs, 0.5, epochs+0.5);
+  TH1F cost_test ("cost_test" , "Cost Function", epochs, 0.5, epochs+0.5);
+  TH1F cost_train("cost_train", "Cost Function", epochs, 0.5, epochs+0.5);
   if (TrainingsSize == -1) TrainingsSize = fTrainingsSize;
 
   for (int k = 0; k < epochs; ++k){
@@ -208,19 +216,25 @@ double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int Training
     }
     if (TestOnTestingData){
       double correct = 0;
+      double cost = 0;
       for (int i = 0; i < fTestingSize; ++i){
         if (Evaluate(fTestingdata[i], fTestinglabel[i]) == true) correct++;
+        cost += EvaluateCost(fTestingdata[i], fTestinglabel[i]);
       }
       // std::cout << "Accuracy of test data: " << correct / fTestingSize << " %"<< std::endl;
       acc_test.SetBinContent(k+1, correct / fTestingSize);
+      cost_test.SetBinContent(k+1, cost / fTestingSize);
     }
     if (TestOnTrainingsData){
       double correct = 0;
+      double cost = 0;
       for (int i = 0; i < TrainingsSize; ++i){
         if (Evaluate(fTrainingsdata[i], fTrainingslabel[i]) == true) correct++;
+        cost += EvaluateCost(fTrainingsdata[i], fTrainingslabel[i]);
       }
       // std::cout << "Accuracy of trainings data: " << correct / TrainingsSize << " %" << std::endl;
       acc_train.SetBinContent(k+1, correct / TrainingsSize);
+      cost_train.SetBinContent(k+1, cost / fTrainingsSize);
     }
   }
   axis.SetStats(false);
@@ -253,14 +267,83 @@ double NeuralNetwork::LearnGivenData(int MiniBatchSize, int epochs, int Training
 
   TLegend leg(0.4,0.1,0.9,0.3);
   leg.SetHeader("Accuracy of");
-  leg.AddEntry(&acc_test,  Form("Test data (Maximum: %3.2f)", max_testdata), "p");
-  leg.AddEntry(&acc_train, Form("Trainings data (Maximum: %3.2f)", max_trainingsdata), "p");
+  leg.AddEntry(&acc_test,  Form("Test data (Maximum: %4.3f)", max_testdata), "p");
+  leg.AddEntry(&acc_train, Form("Trainings data (Maximum: %4.3f)", max_trainingsdata), "p");
   leg.Draw("same");
 
-  c1.SaveAs(SavePath.c_str());
+  c1.SaveAs(Form("%saccuracy.pdf", SavePath.c_str()));
+
+
+
+  c2.cd();
+  axis2.SetStats(false);
+  axis2.GetYaxis()->SetNdivisions(524);
+  axis2.SetAxisRange(cost_train.GetMinimum()*0.9, cost_test.GetMaximum()*1.1, "Y");
+  axis2.Draw("");
+
+  if (epochs > 100) {
+    markersize = 0.5;
+    c2.SetLogx();
+  }
+
+  cost_train.SetStats(false);
+  cost_train.SetMarkerStyle(20);
+  cost_train.SetMarkerColor(kAzure-2);
+  cost_train.SetMarkerSize(1.);
+  cost_train.Draw("p same");
+  cost_test.SetStats(false);
+  cost_test.SetMarkerStyle(20);
+  cost_test.SetMarkerColor(kOrange-3);
+  cost_test.SetMarkerSize(1.);
+  cost_test.Draw("p same");
+  // c1.SetLogx();
+  c2.SetGrid();
+
+  // Calculate maxima
+  double min_trainingsdata = cost_train.GetMinimum();
+  double min_testdata      = cost_test.GetMinimum();
+
+  TLegend leg2(0.4,0.7,0.9,0.9);
+  leg2.SetHeader("Cost Function");
+  leg2.AddEntry(&acc_test,  Form("Test data (Minimum: %4.3f)", min_testdata), "p");
+  leg2.AddEntry(&acc_train, Form("Trainings data (Minimum: %4.3f)", min_trainingsdata), "p");
+  leg2.Draw("same");
+
+  c2.SaveAs(Form("%scost.pdf", SavePath.c_str()));
+
+  c3.cd(1);
+  axis.Draw("");
+  acc_test.Draw("p same");
+  acc_train.Draw("p same");
+  leg.Draw("same");
+  c3.cd(2);
+  axis2.Draw("");
+  cost_test.Draw("p same");
+  cost_train.Draw("p same");
+  leg2.Draw("same");
+  c3.SaveAs(Form("%ssummary.pdf", SavePath.c_str()));
+
+
+
   // std::cout << "Learning completed" << std::endl;
   return max_testdata;
 }
+
+double NeuralNetwork::EvaluateCost(std::vector<double> input, int label){
+  arma::vec outputNN = FeedForward(input);
+
+  arma::vec trueoutput;
+  trueoutput.zeros(neurons[neurons.size()-1]);
+  trueoutput[label] = 1;
+
+  double cost = 0;
+  if (fCostFunction == kCE) cost = 0.5 * arma::norm(outputNN - trueoutput, 2);
+  if (fCostFunction == kMSE) cost = arma::accu(-trueoutput % arma::log(outputNN) - (1-trueoutput) % arma::log(1-outputNN));
+
+
+  return cost;
+}
+
 
 
 // ################################################
